@@ -1,0 +1,136 @@
+<script>
+function getVerify() {
+    var phone = $('#phone').val();
+    // 检查手机号是否合法
+    // ..
+
+    // 发送请求获取验证码
+    $.get("/api/vc", {
+        phone: phone
+    }, function(data) {
+        $('#successVerify').toast('show');
+    });
+}
+
+function postData() {
+    var un = $('#username').val();
+    var pwd = $('#password').val();
+    var tel = $('#phone').val();
+    var cfpwd = $('#confirm-password').val();
+    var vc = $('#verification-code').val();
+
+    if (cfpwd !== pwd) {
+        $('#errorNoPWD').toast('show');
+    } else {
+        var sha256_pwd = SHA256(pwd);
+        $.post("/reg", {
+            un: un,
+            pwd: sha256_pwd,
+            tel: tel,
+            vc: vc
+        }, function(data) {
+            switch (data) {
+                case "ok":
+                    $('#successREG').toast('show');
+                    $(location).attr('href', '/');
+                    break;
+                case "vc-err":
+                    $('#errorVC').toast('show');
+                    break;
+                case "server-err":
+                    $('#errorServer').toast('show');
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+}    
+</script>
+<div class="row justify-content-center">
+    <div class="col-lg-6 mt-5">
+        <h1 class="mb-4">注册</h1>
+
+        <div id="register-form">
+            <div class="mb-3">
+                <label for="username" class="form-label">用户名</label>
+                <input type="text" class="form-control" id="username">
+            </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label">手机号</label>
+                <input type="tel" class="form-control" id="phone">
+            </div>
+            <div class="mb-3">
+                <label for="verification-code" class="form-label">手机验证码</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="verification-code">
+                    <button type="button" class="btn btn-outline-secondary" id="get-verification-code" onclick="getVerify();">获取验证码</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">密码</label>
+                <input type="password" class="form-control" id="password">
+            </div>
+            <div class="mb-3">
+                <label for="confirm-password" class="form-label">确认密码</label>
+                <input type="password" class="form-control" id="confirm-password">
+            </div>
+            <button type="submit" class="btn btn-primary" onclick="postData();">注册</button>
+        </div>
+    </div>
+</div>
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
+    <div id="successVerify" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">成功提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            验证码发送成功！
+        </div>
+    </div>
+</div>
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
+    <div id="errorNoPWD" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">注册失败</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            密码不一致！
+        </div>
+    </div>
+</div>
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
+    <div id="successREG" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">成功提示</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            注册成功！
+        </div>
+    </div>
+</div>
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
+    <div id="errorVC" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">注册失败</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            验证码错误！
+        </div>
+    </div>
+</div>
+<div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
+    <div id="errorServer" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">注册失败</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            服务器错误！请稍后再试。
+        </div>
+    </div>
+</div>
